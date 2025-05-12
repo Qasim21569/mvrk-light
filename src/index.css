@@ -67,7 +67,12 @@
   }
 
   section {
-    @apply py-16 md:py-20;
+    @apply py-16 md:py-20 relative;
+  }
+  
+  /* Add backdrop for better text readability with background image */
+  section:not(.transparent-section) {
+    @apply bg-white bg-opacity-70;
   }
 }
 
@@ -86,5 +91,10 @@
 
   .process-arrow {
     @apply hidden lg:flex items-center text-mvrk-teal text-4xl;
+  }
+  
+  /* Card styles with semi-transparent background */
+  .content-card {
+    @apply bg-white bg-opacity-90 rounded-lg shadow-md p-6;
   }
 }

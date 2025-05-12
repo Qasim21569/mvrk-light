@@ -3,7 +3,7 @@ import React from "react";
 
 const About = () => {
   return (
-    <section id="about" className="bg-white">
+    <section id="about" className="bg-white bg-opacity-70">
       <div className="section-container">
         <h2 className="section-title">About MVRK</h2>
         

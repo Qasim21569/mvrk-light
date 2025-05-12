@@ -4,15 +4,8 @@ import React from "react";
 const Hero = () => {
   return (
     <section
-      className="min-h-screen flex items-center justify-center bg-mvrk-soft-cyan bg-opacity-80 relative"
-      style={{
-        backgroundImage: "url('https://images.unsplash.com/photo-1605106702734-205df224ecce?q=80&w=2070&auto=format&fit=crop')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
+      className="min-h-screen flex items-center justify-center relative"
     >
-      <div className="absolute inset-0 bg-mvrk-soft-cyan bg-opacity-80"></div>
       <div className="section-container relative z-10 text-center animate-fade-in">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-mvrk-navy-slate">
           <span className="text-mvrk-teal">M</span>
