@@ -1,124 +1,174 @@
+'use client';
 
-import React, { useState } from "react";
-import { toast } from "sonner";
+import React, { useEffect } from "react";
+import { motion } from "framer-motion";
 
 const ContactForm = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    company: "",
-    email: "",
-    message: "",
-  });
+  // Load reCAPTCHA script
+  useEffect(() => {
+    // Check if script already exists
+    if (!document.querySelector('script[src="https://www.google.com/recaptcha/api.js"]')) {
+      const script = document.createElement('script');
+      script.src = "https://www.google.com/recaptcha/api.js";
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+      return () => {
+        // Cleanup if component unmounts
+        document.body.removeChild(script);
+      };
+    }
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // This is a placeholder for the actual Salesforce endpoint integration
-    console.log("Form submitted:", formData);
-    
-    // Show success message
-    toast.success("Thank you for your message! We'll be in touch soon.");
-    
-    // Reset form
-    setFormData({
-      name: "",
-      company: "",
-      email: "",
-      message: "",
-    });
-  };
+  // Add timestamp function for reCAPTCHA
+  useEffect(() => {
+    const timestamp = () => {
+      const response = document.getElementById("g-recaptcha-response");
+      if (response == null || response.value.trim() == "") {
+        if (document.getElementsByName("captcha_settings").length > 0) {
+          try {
+            const elems = JSON.parse(document.getElementsByName("captcha_settings")[0].value);
+            elems["ts"] = JSON.stringify(new Date().getTime());
+            document.getElementsByName("captcha_settings")[0].value = JSON.stringify(elems);
+          } catch (e) {
+            console.error("Error updating captcha timestamp", e);
+          }
+        }
+      }
+    };
+
+    const interval = setInterval(timestamp, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <section id="contact" className="bg-white">
-      <div className="section-container">
-        <h2 className="section-title">Get In Touch</h2>
+    <section 
+      id="contact" 
+      className="relative min-h-screen flex flex-col items-center justify-center py-16 overflow-hidden"
+    >
+      {/* Background with gradient */}
+      <div className="absolute inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-gradient-to-b from-white/20 via-[#D4F4F8] to-[#D4F4F8]/30"
+          style={{
+            backgroundImage: "radial-gradient(circle at 30% 70%, rgba(99, 215, 228, 0.15), transparent 70%), radial-gradient(circle at 70% 30%, rgba(223, 109, 134, 0.1), transparent 70%)"
+          }}
+        />
+      </div>
+      
+      <div className="container mx-auto px-6 z-10">
+        {/* Section Title */}
+        <motion.h2 
+          className="text-center text-4xl md:text-5xl font-bold text-[#4C5A6E] pt-12 pb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          Want to Get In Touch?
+        </motion.h2>
         
-        <div className="max-w-3xl mx-auto">
-          <form onSubmit={handleSubmit} className="bg-mvrk-soft-cyan bg-opacity-30 p-8 rounded-lg shadow-md">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Form Container */}
+        <motion.div
+          className="max-w-[800px] mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <div className="bg-white/30 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-white/50">
+            <form 
+              action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8" 
+              method="POST"
+              className="grid grid-cols-1 gap-6"
+            >
+              {/* Hidden Salesforce fields */}
+              <input type="hidden" name="oid" value="00D5j000000JNst" />
+              <input type="hidden" name="retURL" value="https://www.mvrk.io/thank-you" />
+              <input type="hidden" name="captcha_settings" value='{"keyname":"reCAPTCHA","fallback":"true","orgId":"00D5j000000JNst","ts":""}' />
+              
+              {/* First Name */}
               <div>
-                <label htmlFor="name" className="block text-mvrk-navy-slate font-medium mb-2">
-                  Name
+                <label className="text-slate-700 font-medium mb-1 block">
+                  First Name
                 </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
+                <input 
+                  type="text" 
+                  name="first_name" 
                   required
-                  className="w-full px-4 py-3 border border-mvrk-teal border-opacity-20 rounded-md focus:outline-none focus:ring-2 focus:ring-mvrk-teal"
-                  placeholder="Your name"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-[#36A9B1] bg-white/60 transition-shadow"
                 />
               </div>
               
+              {/* Last Name */}
               <div>
-                <label htmlFor="company" className="block text-mvrk-navy-slate font-medium mb-2">
-                  Company
+                <label className="text-slate-700 font-medium mb-1 block">
+                  Last Name
                 </label>
-                <input
-                  type="text"
-                  id="company"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-mvrk-teal border-opacity-20 rounded-md focus:outline-none focus:ring-2 focus:ring-mvrk-teal"
-                  placeholder="Your company"
+                <input 
+                  type="text" 
+                  name="last_name" 
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-[#36A9B1] bg-white/60 transition-shadow"
                 />
               </div>
               
-              <div className="md:col-span-2">
-                <label htmlFor="email" className="block text-mvrk-navy-slate font-medium mb-2">
+              {/* Email */}
+              <div>
+                <label className="text-slate-700 font-medium mb-1 block">
                   Email
                 </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
+                <input 
+                  type="email" 
+                  name="email" 
                   required
-                  className="w-full px-4 py-3 border border-mvrk-teal border-opacity-20 rounded-md focus:outline-none focus:ring-2 focus:ring-mvrk-teal"
-                  placeholder="your.email@company.com"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-[#36A9B1] bg-white/60 transition-shadow"
                 />
               </div>
               
-              <div className="md:col-span-2">
-                <label htmlFor="message" className="block text-mvrk-navy-slate font-medium mb-2">
-                  Message
+              {/* Company */}
+              <div>
+                <label className="text-slate-700 font-medium mb-1 block">
+                  Company
                 </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
+                <input 
+                  type="text" 
+                  name="company" 
                   required
-                  rows={5}
-                  className="w-full px-4 py-3 border border-mvrk-teal border-opacity-20 rounded-md focus:outline-none focus:ring-2 focus:ring-mvrk-teal resize-none"
-                  placeholder="How can we help you?"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-[#36A9B1] bg-white/60 transition-shadow"
+                />
+              </div>
+              
+              {/* Description */}
+              <div>
+                <label className="text-slate-700 font-medium mb-1 block">
+                  Description
+                </label>
+                <textarea 
+                  name="description" 
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:ring-2 focus:ring-[#36A9B1] bg-white/60 transition-shadow min-h-[150px]"
                 ></textarea>
               </div>
-            </div>
-            
-            <div className="mt-8 flex justify-center">
-              <button
-                type="submit"
-                className="px-8 py-3 bg-mvrk-teal text-white rounded-md hover:bg-mvrk-aqua-blue transition-colors shadow-md"
-              >
-                Send Message
-              </button>
-            </div>
-            
-            <p className="text-sm text-center mt-4 text-mvrk-navy-slate opacity-80">
-              By submitting this form, you agree to our Privacy Policy.
-            </p>
-          </form>
-        </div>
+              
+              {/* reCAPTCHA */}
+              <div className="mt-4 mb-6">
+                <div className="g-recaptcha" data-sitekey="6LfNcPwUAAAAAHtxjzwFWle1aBW-XgIMpOyHqWR0"></div>
+              </div>
+              
+              {/* Submit Button */}
+              <div className="flex justify-center">
+                <motion.button
+                  type="submit"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-[#36A9B1] text-white py-3 px-6 rounded-lg shadow hover:bg-[#2f8d99] transition"
+                >
+                  Submit
+                </motion.button>
+              </div>
+            </form>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,8 +1,5 @@
-
-import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
-import ValuesSlider from "@/components/ValuesSlider";
 import Implementation from "@/components/Implementation";
 import Improvement from "@/components/Improvement";
 import Testimonials from "@/components/Testimonials";
@@ -12,21 +9,27 @@ import Footer from "@/components/Footer";
 const Index = () => {
   return (
     <div className="flex flex-col min-h-screen relative">
+      {/* Fixed background with blur */}
       <div 
         className="fixed inset-0 z-0" 
         style={{
-          backgroundImage: "url('/lovable-uploads/dba3700c-84ba-4d10-9701-a7079b020805.png')",
+          backgroundImage: "url('/background.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
           opacity: "0.15"
         }}
       />
-      <Navbar />
+      
+      {/* Globally blurred overlay for better text readability */}
+      <div 
+        className="fixed inset-0 z-0 backdrop-blur-xl bg-white/20"
+      />
+
+      {/* Main content */}
       <main className="flex-grow relative z-10">
         <Hero />
         <About />
-        <ValuesSlider />
         <Implementation />
         <Improvement />
         <Testimonials />
